@@ -4,8 +4,6 @@ from torch.nn import functional as F
 import numpy as np
 from torch.utils.data import IterableDataset
 
-# from causaldro.utils import CUDA
-
 def CUDA(var, device = 'cuda:2'):
     device = torch.device(device if torch.cuda.is_available() else 'cpu')
     var = var.to(device)
@@ -17,15 +15,6 @@ def temp_sigmoid(x, temp=1.0):
 
 class TransitionDataset_Subcosts(IterableDataset):
     """
-    A dataset of transitions (state, action, reward, next state) used for training RL agents.
-    
-    Args:
-        dataset (dict): A dictionary of NumPy arrays containing the observations, actions, rewards, etc.
-        reward_scale (float): The scale factor for the rewards.
-        cost_scale (float): The scale factor for the costs.
-        state_init (bool): If True, the dataset will include an "is_init" flag indicating if a transition
-            corresponds to the initial state of an episode.
-
     """
 
     def __init__(self,
@@ -79,14 +68,7 @@ class TransitionDataset_Subcosts(IterableDataset):
 
 class TransitionDataset(IterableDataset):
     """
-    A dataset of transitions (state, action, reward, next state) used for training RL agents.
-    
-    Args:
-        dataset (dict): A dictionary of NumPy arrays containing the observations, actions, rewards, etc.
-        reward_scale (float): The scale factor for the rewards.
-        cost_scale (float): The scale factor for the costs.
-        state_init (bool): If True, the dataset will include an "is_init" flag indicating if a transition
-            corresponds to the initial state of an episode.
+
 
     """
 
@@ -303,19 +285,12 @@ class CausalDecomposition(nn.Module):
     def loss_function(self, cost, cost_predict):
         mse = F.mse_loss(cost, cost_predict) * self.mse_weight
         sparse = self.sparse_weight * torch.mean(torch.sigmoid(self.mask_prob)**self.sparse_norm)
-        # grad_sparse = self.mask_prob.grad
-        # print(grad_sparse)
-        # cosi = torch.nn.CosineSimilarity(dim=0)
+        
         vector = torch.sigmoid(self.mask_prob)
         v1 = vector[:, 0]
         v2 = vector[:, 1]
 
         sim_loss =  (v1*v2).mean() # 2 dim case
-
-        # if vector.shape[-1] > 2:
-        #     v3 = vector[:, 2]
-        #     sim_loss += (v1*v3).mean() 
-        #     sim_loss += (v2*v3).mean() 
         
         sim_loss = self.sim_weight * sim_loss
 
@@ -350,24 +325,15 @@ class CausalDecomposition(nn.Module):
     
     def subcost_loss_function(self, sub_cost_0, sub_cost_1, sub_cost_2, cost_predict):
         cost = torch.concatenate((sub_cost_0, sub_cost_1, sub_cost_2)).reshape(-1, 3)
-        # print(cost.shape)
-        # print(sub_cost_0.shape)
-        # print(cost_predict.shape)
+
         mse = F.mse_loss(cost, cost_predict) * self.mse_weight
         sparse = self.sparse_weight * torch.mean(torch.sigmoid(self.mask_prob)**self.sparse_norm)
-        # grad_sparse = self.mask_prob.grad
-        # print(grad_sparse)
-        # cosi = torch.nn.CosineSimilarity(dim=0)
+
         vector = torch.sigmoid(self.mask_prob)
         v1 = vector[:, 0]
         v2 = vector[:, 1]
 
         sim_loss =  (v1*v2).mean() # 2 dim case
-
-        # if vector.shape[-1] > 2:
-        #     v3 = vector[:, 2]
-        #     sim_loss += (v1*v3).mean() 
-        #     sim_loss += (v2*v3).mean() 
         
         sim_loss = self.sim_weight * sim_loss
 

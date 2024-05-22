@@ -1,4 +1,4 @@
-# modified from https://github.com/Farama-Foundation/D4RL/blob/master/d4rl/offline_env.py
+
 
 import os
 import urllib.request

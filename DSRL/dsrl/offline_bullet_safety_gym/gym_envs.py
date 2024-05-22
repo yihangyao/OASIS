@@ -2,7 +2,6 @@ from .. import offline_env
 from bullet_safety_gym.envs.builder import EnvironmentBuilder
 
 
-# env configs from https://github.com/liuzuxin/Bullet-Safety-Gym
 class AntCircleEnv(EnvironmentBuilder):
     def __init__(self):
         agent='Ant'

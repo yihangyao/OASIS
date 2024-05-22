@@ -961,7 +961,7 @@ class TransitionDataset(IterableDataset):
         return action * self.action_std + self.action_mean
     
     def update_data(self, 
-                    datapath="/home/yihang/code/OSRL_DD/Generation/test.hdf5", 
+                    datapath=None, 
                     replace=False,
                     visualization=True
                     ):
@@ -985,25 +985,6 @@ class TransitionDataset(IterableDataset):
         data_dict["terminals"] = data_dict["terminals"].reshape(-1)
         data_dict["timeouts"] = data_dict["timeouts"].reshape(-1)
         data_dict["done"] = np.zeros(data_dict["timeouts"].shape)
-
-        # data_dict["actions"] = self.normalize_action(data_dict["actions"]) # TODO: Debug
-
-        if visualization:
-            plt.figure(7)
-            ori_x, ori_y = self.dataset["observations"][::20, 0], self.dataset["observations"][::20, 1]
-            new_x, new_y = data_dict["observations"][::20, 0], data_dict["observations"][::20, 1]
-            plt.scatter(ori_x, ori_y, alpha=0.15, label="original obs")
-            plt.scatter(new_x, new_y, alpha=0.15, label="generated obs")
-            plt.legend()
-            plt.savefig("/home/yihang/code/OSRL_DD/OSRL/examples/train/generated_obs_dist_comparison.png", dpi=400)
-
-            plt.figure(8)
-            ori_x, ori_y = self.dataset["actions"][::20, 0], self.dataset["actions"][::20, 1]
-            new_x, new_y = data_dict["actions"][::20, 0], data_dict["actions"][::20, 1]
-            plt.scatter(ori_x, ori_y, alpha=0.15, label="original act")
-            plt.scatter(new_x, new_y, alpha=0.15, label="generated act")
-            plt.legend()
-            plt.savefig("/home/yihang/code/OSRL_DD/OSRL/examples/train/generated_act_dist_comparison.png", dpi=400)
 
         if replace:
             self.dataset = data_dict

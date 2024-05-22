@@ -232,42 +232,8 @@ def train(args: OASISTrainConfig):
         # print("dataset max reward return:", max_returns)
 
         if (step + 1) % args.eval_every == 0 or step == args.update_steps - 1 or args.resume: # True or 
-            average_reward, average_cost = [], []
-            log_cost, log_reward, log_len = {}, {}, {}
- 
-            ret, cost, length = trainer.evaluate(
-                args.eval_episodes,
-                args.test_condition)
-            average_cost.append(cost)
-            average_reward.append(ret)
-
-            name = "eval_rollouts"
-            log_cost.update({name: cost})
-            log_reward.update({name: ret})
-            log_len.update({name: length})
-            
-
-            logger.store(tab="cost", **log_cost)
-            logger.store(tab="reward", **log_reward)
-            logger.store(tab="length", **log_len)
-
             # save the current weight
             logger.save_checkpoint(suffix = "-{}".format(step + 1))
-            # save the best weight
-            mean_ret = np.mean(average_reward)
-            mean_cost = np.mean(average_cost)
-
-            if args.resume:
-                print("mean_ret:", mean_ret)
-                print("mean_cost:", mean_cost)
-            if mean_cost < best_cost or (mean_cost == best_cost
-                                         and mean_ret > best_reward):
-                best_cost = mean_cost
-                best_reward = mean_ret
-                best_idx = step
-                logger.save_checkpoint(suffix="best")
-
-            logger.store(tab="train", best_idx=best_idx)
             logger.write(step, display=False)
 
         else:

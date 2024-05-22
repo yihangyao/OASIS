@@ -24,7 +24,7 @@ from osrl.common.net import cosine_beta_schedule, extract, apply_conditioning, L
 from osrl.algorithms import OASIS
 import matplotlib.pyplot as plt
 from osrl.common import SequenceDataset
-import seaborn as sns
+# import seaborn as sns
 
 from osrl.common.plot import *
 
@@ -42,6 +42,7 @@ import torch.nn as nn
 @pyrallis.wrap()
 def main(args: OASISTrainConfig):
     cfg, old_cfg = asdict(args), asdict(OASISTrainConfig())
+
     if "Metadrive" in args.task:
         import gym
     else: 
@@ -110,7 +111,7 @@ def main(args: OASISTrainConfig):
         returns_condition = args.returns_condition,
         condition_guidance_w = args.condition_guidance_w
     )
-
+    
     path = "../models/BallCircle.pt"
 
     model_state = torch.load(path) #  model.load_state_dict
@@ -153,7 +154,7 @@ def main(args: OASISTrainConfig):
     reward_model.eval()
     cost_model.eval()
 
-    conditional_generation(
+    eval_generation_traj(
         dataset=dataset,
         model = model,
         seq_len=args.seq_len,
@@ -165,7 +166,7 @@ def main(args: OASISTrainConfig):
     )
 
 
-def conditional_generation(dataset, 
+def eval_generation_traj(dataset, 
                         model=None, 
                         seq_len = None,
                         device = "cuda:3",
@@ -181,8 +182,10 @@ def conditional_generation(dataset,
     # observations, next_observations, actions, rewards, costs, done
     # seq_len += 1
     model.eval()
-    batch_size = 50  # dataset.dataset_size // seq_len
+    batch_size = 2000  # dataset.dataset_size // seq_len
     s, next_observations, actions, rewards, costs, done = dataset.random_sample(batch_size)
+
+    # s: [Batch_size, s_dim]
 
     s = dataset.normalize_obs(s)
     s = to_torch(s, device=device)
@@ -193,7 +196,7 @@ def conditional_generation(dataset,
 
     clip_len = min(clip_len+1, seq_len)
     
-    test_condition_list = [[0.2, 0.8]] # Correspong to cost = 20
+    test_condition_list = [[0.2, 0.8]]
     
     with torch.no_grad():
         s_list = None
@@ -272,14 +275,57 @@ def conditional_generation(dataset,
 
     save(
         log_dir="../dataset/",
-        dataset_name= name +  "-condition-" + str(test_condition_list) + "-num-" + str(num) + suffix + \
+        dataset_name= name +  "-num-" + str(num) + suffix + \
                   ".hdf5",
         data=traj_data
     )
 
     return
+    
+def conditional_generation(device, 
+                           model, 
+                           test_ret,
+                           cost_ret,
+                           dataset,
+                           s,
+                           reward_model = None,
+                           cost_model = None, 
+                           clip_len = 8):
+    obs = s
+    conditions = {0: to_torch(obs, device=device)}
+    samples, diffusion = model.conditional_sample(conditions,
+                                                    return_diffusion=True,
+                                                    returns = test_ret, 
+                                                    cost_returns = cost_ret)
+    samples = samples[:, :clip_len, :]
+    s = samples[:, :-1, :]
+    s_next = samples[:, 1:, :]
+
+    s = torch.flatten(s, start_dim=0, end_dim=1) # [Batch_size, s_dim]
+    s_next = torch.flatten(s_next, start_dim=0, end_dim=1) # [Batch_size, s_dim]
+    x_comb_t = torch.cat([s, s_next], dim=-1)
+    x_comb_t = x_comb_t.reshape(-1, 2 * s_next.shape[-1])
+    a = model.inv_model(x_comb_t)
+
+    
+
+
+    s = s.detach().cpu().numpy()
+    s_next = s_next.detach().cpu().numpy()
+    a = a.detach().cpu().numpy()
+
+    s = dataset.denormalize_obs(s)
+    s_next = dataset.denormalize_obs(s_next)
+    a = dataset.denormalize_action(a)
+
+    if reward_model is not None and cost_model is not None:
+        r_pred = reward_model(torch.tensor(s_next, device=device))
+        c_pred = cost_model(torch.tensor(s_next, device=device))
+        r_pred = r_pred.detach().cpu().numpy() * 0.1
+        c_pred = c_pred.detach().cpu().numpy()
+    
+    return s, s_next, a, r_pred, c_pred
 
 if __name__ == "__main__":
     main()
-    
     

@@ -45,8 +45,7 @@ class OASISTrainConfig:
     num_workers: int = 6
 
     resume: bool = False
-    resume_path: str = None #"/home/yihang/code/OSRL_DD/OSRL/examples/train/logs/OfflineCarCircle-v0-test_ret-(0.1, 0.6)-w-2.0-n_step-20-seq_len-64-emb-64-remove_c-20.0-ratio-0.9/DD-9597/DD-9597/checkpoint/model_-60000.pt"
-
+    resume_path: str = None 
     # general params
     seed: int = 20
     device: str = "cuda:3"

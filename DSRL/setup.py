@@ -35,9 +35,9 @@ setup(
     description="Datasets for Offline Safe Reinforcement Learning",
     long_description=open("README.md", encoding="utf8").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/liuzuxin/dsrl",
+    url=" ",
     author="DSRL contributors",
-    author_email="zuxin1997@gmail.com",
+    author_email=" ",
     license="Apache",
     python_requires=">=3.8",
     classifiers=[

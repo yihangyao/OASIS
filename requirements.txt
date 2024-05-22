@@ -1,0 +1,13 @@
+bullet_safety_gym==1.4.0
+dsrl.egg==info
+fast_safe_rl==0.1.0
+gym==0.26.2
+gymnasium==0.28.1
+h5py==3.11.0
+matplotlib==3.7.5
+numpy==1.24.4
+osrl_lib.egg==info
+pyrallis==0.3.1
+tianshou==0.5.1
+torch==1.13.1
+tqdm==4.66.2

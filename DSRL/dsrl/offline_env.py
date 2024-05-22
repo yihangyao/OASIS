@@ -504,9 +504,9 @@ class OfflineEnv(gym.Env):
         else:
             fig_name = f"no_removed-num-{len(trajs)}"
             
-        plt.savefig(
-            fig_name+"-ilustration.png", dpi=400
-        )
+        # plt.savefig(
+        #     fig_name+"-ilustration.png", dpi=400
+        # )
 
         processed_data_dict = defaultdict(list)
         for k in data_dict.keys():

@@ -107,9 +107,7 @@ class TransitionDataset(IterableDataset):
         actions = self.dataset["actions"][idx, :]
         rewards = self.dataset["rewards"][idx] * self.reward_scale
         costs = self.dataset["costs"][idx] * self.cost_scale
-        # sub_cost_0 = self.dataset["sub_cost_0"][idx] * self.cost_scale
-        # sub_cost_1 = self.dataset["sub_cost_1"][idx] * self.cost_scale
-        # sub_cost_2 = self.dataset["sub_cost_2"][idx] * self.cost_scale
+        
         done = self.dataset["done"][idx]
         if self.state_init:
             is_init = self.dataset["is_init"][idx]

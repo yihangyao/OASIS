@@ -12,7 +12,7 @@ envs/safety-gym/mujoco200_linux
 
 *.hdf5
 
-**/figure/**
+# **/figure/**
 **/wandb/**
 **/log/**
 **/fig/**
@@ -21,7 +21,7 @@ envs/safety-gym/mujoco200_linux
 **/misc/**
 
 *.pth
-*.png
+# *.png
 
 **/**.pt
 # C extensions

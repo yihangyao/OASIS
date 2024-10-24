@@ -1,4 +1,18 @@
-# OASIS Implementation (NeurIPS 2024 submission)
+# <img src="figure/oasis.png" width="40"> OASIS: Conditional Distribution Shaping for Offline Safe Reinforcement Learning 
+Conference on Neural Information Processing Systems (NeurIPS), 2024
+
+[**[Project Page]**](https://zhengyinan-air.github.io/FISOR/) [**[Arxiv]**](https://arxiv.org/pdf/2401.10700.pdf) [**[Openreview]**](https://openreview.net/forum?id=j5JvZCaDM0)
+
+[Yihang Yao*]( ), [Zhepeng Cen*]( ), [Wenhao Ding]( ), [Haohong Lin]( ), [Shiqi Liu]( ), [Tingnan Zhang]( ), [Wenhao Yu]( ), [Ding Zhao]( )
+
+The official implementation of OASIS, a **Data-centric** approach for offline safe RL.
+
+# Methods
+
+<p float="left">
+<img src="figure/oasis-overview.png" width="800">
+</p>
+
 
 ### Installation
 This code is tested on an Ubuntu 18.04 system.
@@ -43,3 +57,16 @@ It will use the dataset saved in the "dataset" folder to train an BCQ-Lag agent.
 - AdaptDiffuser: https://github.com/Liang-ZX/AdaptDiffuser
 - OSRL: https://github.com/liuzuxin/osrl
 - DSRL: https://github.com/liuzuxin/dsrl
+
+## Bibtex
+
+If you find our code and paper can help, please cite our paper as:
+```
+@article{
+    yao2024oasis,
+    title={OASIS: Conditional Distribution Shaping for Offline Safe Reinforcement Learning},
+    author={Yao, Yihang and Cen, Zhepeng and Ding, Wenhao and Lin, Haohong and Liu, Shiqi and Zhang, Tingnan and Yu, Wenhao and Zhao, Ding},
+    journal={arXiv preprint arXiv:2407.14653},
+    year={2024}
+}
+```

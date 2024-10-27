@@ -222,6 +222,7 @@ class OASIS(nn.Module):
 
         batch_size = shape[0]
         x = 0.5*torch.randn(shape, device=device) # why 0.5?
+        # ablation
         x = apply_conditioning(x, cond, 0)
 
         if return_diffusion: diffusion = [x]
@@ -229,6 +230,7 @@ class OASIS(nn.Module):
         for i in reversed(range(0, self.n_timesteps)):
             timesteps = torch.full((batch_size,), i, device=device, dtype=torch.long)
             x = self.p_sample(x, cond, timesteps, returns, cost_returns)
+            # ablation
             x = apply_conditioning(x, cond, 0)
 
             if return_diffusion: diffusion.append(x)
@@ -286,9 +288,10 @@ class OASIS(nn.Module):
         #     noise[:, 0, self.action_dim:] = 0
 
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise) # forward sampling
+        
+        # ablation
         x_noisy = apply_conditioning(x_noisy, cond, 0)
-        # print(x_noisy.shape, t.shape)
-        # assert 1==2
+        
         x_recon = self.model(x_noisy, cond, t, returns=returns, cost_returns=cost_returns)
 
         if not self.predict_epsilon:

@@ -13,7 +13,7 @@ from dsrl.offline_env import get_keys
 try:
     import oapackage
 except ImportError:
-    print("OApackage is not installed, can not use CDT.")
+    print("OApackage is not installed, can not use OASIS.")
 from scipy.optimize import minimize
 from torch.nn import functional as F  # noqa
 from torch.utils.data import IterableDataset

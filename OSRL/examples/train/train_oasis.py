@@ -1,8 +1,7 @@
 import os
 import uuid
 import types
-from dataclasses import asdict, dataclass
-from typing import Any, DefaultDict, Dict, List, Optional, Tuple
+from dataclasses import asdict
 
 import bullet_safety_gym  # noqa
 import dsrl
@@ -11,12 +10,12 @@ import numpy as np
 import pyrallis
 import torch
 from dsrl.infos import DENSITY_CFG
-from dsrl.offline_env import OfflineEnvWrapper, wrap_env, NormalizationEnvWrapper  # noqa
+from dsrl.offline_env import wrap_env, NormalizationEnvWrapper  # noqa
 from fsrl.utils import WandbLogger
 from torch.utils.data import DataLoader
 from tqdm.auto import trange  # noqa
 
-from osrl.configs.oasis_configs import OASISTrainConfig
+from osrl.configs.oasis_configs import OASISTrainConfig, DD_DEFAULT_CONFIG
 
 from osrl.algorithms import OASIS, OASISTrainer
 from osrl.common import SequenceDataset
@@ -26,16 +25,22 @@ from osrl.common.exp_util import auto_name, seed_all
 @pyrallis.wrap()
 def train(args: OASISTrainConfig):
     # update config
+    # cfg, old_cfg = asdict(args), asdict(OASISTrainConfig())
+    # args = types.SimpleNamespace(**cfg)
+    
     cfg, old_cfg = asdict(args), asdict(OASISTrainConfig())
+    differing_values = {key: cfg[key] for key in cfg.keys() if cfg[key] != old_cfg[key]}
+    cfg = asdict(DD_DEFAULT_CONFIG[args.task]())
+    cfg.update(differing_values)
     args = types.SimpleNamespace(**cfg)
 
     # setup logger
-    default_cfg = asdict(OASISTrainConfig())
+    default_cfg = asdict(DD_DEFAULT_CONFIG[args.task]())
     if args.name is None:
-        args.name = auto_name(default_cfg, cfg, args.prefix, args.suffix)
-        # args.name += '-test_ret-' + str(args.test_ret) + "-w-" + str(args.condition_guidance_w)
+        args.name = auto_name(default_cfg, cfg, args.prefix, args.suffix) + '-camera-ready-1026' # + '-condition-ablation'
+    # args.name += '-test_ret-' + str(args.test_ret) + "-w-" + str(args.condition_guidance_w)
     if args.group is None:
-        args.group = "OASIS-" + args.task
+        args.group = "OASIS-" + args.task + '-camera-ready-1026'
     if args.logdir is not None:
         args.logdir = os.path.join(args.logdir, args.group, args.name)
     logger = WandbLogger(cfg, args.project, args.group, args.name, args.logdir)
@@ -199,11 +204,6 @@ def train(args: OASISTrainConfig):
     )
     trainloader_iter = iter(trainloader)
 
-    # for saving the best
-    best_reward = -np.inf
-    best_cost = np.inf
-    best_idx = 0
-
     max_returns = 0
 
     for step in trange(args.update_steps, desc="Training"):
@@ -234,6 +234,49 @@ def train(args: OASISTrainConfig):
         if (step + 1) % args.eval_every == 0 or step == args.update_steps - 1 or args.resume: # True or 
             # save the current weight
             logger.save_checkpoint(suffix = "-{}".format(step + 1))
+            logger.write(step, display=False)
+
+        else:
+            logger.write_without_reset(step)
+        
+        # diffuser evaluation
+        if (step + 1) % args.eval_every == 0 or step == args.update_steps - 1 or args.resume: # True or 
+            average_reward, average_cost = [], []
+            log_cost, log_reward, log_len = {}, {}, {}
+ 
+            ret, cost, length = trainer.evaluate(
+                args.eval_episodes,
+                args.test_condition)
+            average_cost.append(cost)
+            average_reward.append(ret)
+
+            name = "eval_rollouts"
+            log_cost.update({name: cost})
+            log_reward.update({name: ret})
+            log_len.update({name: length})
+            
+
+            logger.store(tab="cost", **log_cost)
+            logger.store(tab="reward", **log_reward)
+            logger.store(tab="length", **log_len)
+
+            # save the current weight
+            logger.save_checkpoint(suffix = "-{}".format(step + 1))
+            # save the best weight
+            mean_ret = np.mean(average_reward)
+            mean_cost = np.mean(average_cost)
+
+            if args.resume:
+                print("mean_ret:", mean_ret)
+                print("mean_cost:", mean_cost)
+            # if mean_cost < best_cost or (mean_cost == best_cost
+            #                              and mean_ret > best_reward):
+            #     best_cost = mean_cost
+            #     best_reward = mean_ret
+            #     best_idx = step
+            #     logger.save_checkpoint(suffix="best")
+
+            # logger.store(tab="train", best_idx=best_idx)
             logger.write(step, display=False)
 
         else:

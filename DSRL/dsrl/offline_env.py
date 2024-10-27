@@ -384,9 +384,11 @@ class OfflineEnv(gym.Env):
 
         print("reward return max:", reward_returns.max())
         print("cost return max:", cost_returns.max())
+        self.cost_scale_max = cost_returns.max()
 
         self.reward_returns = reward_returns / reward_returns.max()
         self.cost_returns = cost_returns / cost_returns.max()
+        
 
         # outliers and inpaint ranges are based-on episode cost returns
         if outliers_percent is not None:

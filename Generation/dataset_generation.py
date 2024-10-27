@@ -112,7 +112,7 @@ def main(args: OASISTrainConfig):
         condition_guidance_w = args.condition_guidance_w
     )
     
-    path = "../models/BallCircle.pt"
+    path = "../models/CC/CC_camera_ready.pt"
 
     model_state = torch.load(path) #  model.load_state_dict
     model.load_state_dict(model_state['model_state'])
@@ -148,8 +148,8 @@ def main(args: OASISTrainConfig):
         learning_mode="cost"
     )
 
-    reward_model.load_model(path="../models/BC_reward.pt")
-    cost_model.load_model(path="../models/BC_cost.pt")
+    reward_model.load_model(path="../models/CC/CC_reward.pt")
+    cost_model.load_model(path="../models/CC/CC_cost.pt")
 
     reward_model.eval()
     cost_model.eval()
@@ -162,7 +162,8 @@ def main(args: OASISTrainConfig):
         name=args.task,
         reward_model=reward_model,
         cost_model=cost_model,
-        clip_len=16
+        clip_len=16,
+        cost_scale_max = env.cost_scale_max
     )
 
 
@@ -174,7 +175,8 @@ def eval_generation_traj(dataset,
                         zero_rc = False,
                         reward_model = None,
                         cost_model = None,
-                        clip_len = 16
+                        clip_len = 16,
+                        cost_scale_max = 100
                         ):
     """
         model is a diffusion model
@@ -196,7 +198,12 @@ def eval_generation_traj(dataset,
 
     clip_len = min(clip_len+1, seq_len)
     
-    test_condition_list = [[0.2, 0.8]]
+    safety_threshold = 20
+    cost_scale = cost_scale_max
+    print("cost scale:", cost_scale)
+    cost_condition = safety_threshold / cost_scale # 20 means the cost safety threshold
+    
+    test_condition_list = [[cost_condition, 0.6]]
     
     with torch.no_grad():
         s_list = None
@@ -269,7 +276,7 @@ def eval_generation_traj(dataset,
 
         num = s_list.shape[0] * s_list.shape[1] 
 
-    suffix = "_BC_" + "-batch_size-" + str(batch_size)
+    suffix = "_BC_" + "-batch_size-" + str(batch_size) + "-c-" + str(safety_threshold) + '-condition-' + str(test_condition_list) + '-1027-CAMERA'
     if zero_rc:
         suffix += "-zero_rc"
 

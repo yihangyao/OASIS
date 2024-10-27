@@ -5,8 +5,8 @@ import numpy as np
 @dataclass
 class OASISTrainConfig:
     # wandb params
-    project: str = "OASIS"
-    task: str = "OfflineBallCircle-v0" 
+    project: str = "OASIS-(Camera Ready)-1026"
+    task: str = "OfflineCarCircle-v0" 
     group: str = None
     name: Optional[str] = None
     prefix: Optional[str] = "OASIS"
@@ -48,7 +48,7 @@ class OASISTrainConfig:
     resume_path: str = None 
     # general params
     seed: int = 20
-    device: str = "cuda:3"
+    device: str = "cuda:1"
 
     # additional dataset operation
     removed_r_min: float = -np.inf
@@ -59,7 +59,7 @@ class OASISTrainConfig:
 
     # test condition
     visualization_log: str = "visualization"
-    test_condition: Tuple[float, float] = (0.2, 0.6) # cost, reward
+    test_condition: Tuple[float, float] = (0.25, 0.75) # cost, reward
     
     condition_guidance_w: float = 2. # TODO weight
     saving_interval = 10000
@@ -121,3 +121,120 @@ class OASISTrainConfig:
     cstd: float = 0.2
 
 
+@dataclass
+class DDCarCircleConfig(OASISTrainConfig):
+    pass
+
+@dataclass
+class DDAntRunConfig(OASISTrainConfig):
+    # model params
+    seq_len: int = 32
+    episode_len: int = 200
+    # training params
+    task: str = "OfflineAntRun-v0"
+    target_returns: Tuple[Tuple[float, ...],
+                          ...] = ((700.0, 10), (750.0, 20), (800.0, 40))
+    # augmentation param
+    deg: int = 3
+    max_reward: float = 1000.0
+    max_rew_decrease: float = 150
+     
+
+
+@dataclass
+class DDDroneRunConfig(OASISTrainConfig):
+    # model params
+    seq_len: int = 32
+    episode_len: int = 200
+    # training params
+    task: str = "OfflineDroneRun-v0"
+    target_returns: Tuple[Tuple[float, ...],
+                          ...] = ((400.0, 10), (500.0, 20), (600.0, 40))
+    # augmentation param
+    deg: int = 1
+    max_reward: float = 700.0
+    max_rew_decrease: float = 100
+    min_reward: float = 1
+     
+
+
+@dataclass
+class DDDroneCircleConfig(OASISTrainConfig):
+    # model params
+    seq_len: int = 64
+    episode_len: int = 300
+    update_steps: int = 250_000
+    # training params
+    task: str = "OfflineDroneCircle-v0"
+    target_returns: Tuple[Tuple[float, ...],
+                          ...] = ((700.0, 10), (750.0, 20), (800.0, 40))
+    # augmentation param
+    deg: int = 1
+    max_reward: float = 1000.0
+    max_rew_decrease: float = 100
+    min_reward: float = 1
+    #  
+
+
+@dataclass
+class DDCarRunConfig(OASISTrainConfig):
+    # model params
+    seq_len: int = 32
+    episode_len: int = 200
+    # training params
+    task: str = "OfflineCarRun-v0"
+    target_returns: Tuple[Tuple[float, ...],
+                          ...] = ((575.0, 10), (575.0, 20), (575.0, 40))
+    # augmentation param
+    deg: int = 0
+    max_reward: float = 600.0
+    max_rew_decrease: float = 100
+    min_reward: float = 1
+     
+
+
+@dataclass
+class DDAntCircleConfig(OASISTrainConfig):
+    # model params
+    seq_len: int = 32
+    episode_len: int = 500
+    # training params
+    task: str = "OfflineAntCircle-v0"
+    target_returns: Tuple[Tuple[float, ...],
+                          ...] = ((300.0, 10), (350.0, 20), (400.0, 40))
+    # augmentation param
+    deg: int = 2
+    max_reward: float = 500.0
+    max_rew_decrease: float = 100
+    min_reward: float = 1
+     
+
+
+@dataclass
+class DDBallRunConfig(OASISTrainConfig):
+    # model params
+    # seq_len: int = 32
+    episode_len: int = 100
+    # training params
+    task: str = "OfflineBallRun-v0"
+    target_returns: Tuple[Tuple[float, ...],
+                          ...] = ((500.0, 10), (500.0, 20), (700.0, 40))
+    # augmentation param
+    deg: int = 2
+    max_reward: float = 1400.0
+    max_rew_decrease: float = 200
+    min_reward: float = 1
+
+@dataclass
+class DDBallCircleConfig(OASISTrainConfig):
+    pass
+
+DD_DEFAULT_CONFIG = {
+    # bullet_safety_gym
+    "OfflineBallRun-v0": DDBallRunConfig,
+    "OfflineBallCircle-v0": DDBallCircleConfig,
+    "OfflineCarRun-v0": DDCarRunConfig,
+    "OfflineCarCircle-v0": DDCarCircleConfig,
+    "OfflineDroneRun-v0": DDDroneRunConfig,
+    "OfflineDroneCircle-v0": DDDroneCircleConfig,
+}

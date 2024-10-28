@@ -10,7 +10,7 @@ class BCQLTrainConfig:
     project: str = "OASIS-BCQL-Camera-Ready" 
     group: str = None
     name: Optional[str] = None
-    prefix: Optional[str] = "OASIS-BCQL-1027-CR-[0.2, 0.6]"
+    prefix: Optional[str] = "OASIS-BCQL-1027-CR-[0.1, 0.7]-new_model-2"
     suffix: Optional[str] = ""
     logdir: Optional[str] = "logs"
     verbose: bool = True
@@ -25,7 +25,7 @@ class BCQLTrainConfig:
     dataset: str = None
     seed: int = 33
     device: str = "cuda:1"
-    new_data_path: Optional[str] = "../../../dataset/OfflineCarCircle-v0-num-32000_BC_-batch_size-2000-c-20-condition-[[0.2, 0.6]]-1027-CAMERA.hdf5"
+    new_data_path: Optional[str] = "../../../dataset/OfflineCarCircle-v0-num-96000_BC_-batch_size-6000-c-10-condition-[[0.1, 0.7]]-1027-CAMERA-2.hdf5"
 
     update_data: bool = True
     replace: bool = True

@@ -5,8 +5,8 @@ import numpy as np
 @dataclass
 class OASISTrainConfig:
     # wandb params
-    project: str = "OASIS-(Camera Ready)-1026"
-    task: str = "OfflineCarCircle-v0" 
+    project: str = "OASIS-(Camera Ready)-1027"
+    task: str = "OfflineDroneCircle-v0" 
     group: str = None
     name: Optional[str] = None
     prefix: Optional[str] = "OASIS"
@@ -59,7 +59,7 @@ class OASISTrainConfig:
 
     # test condition
     visualization_log: str = "visualization"
-    test_condition: Tuple[float, float] = (0.25, 0.75) # cost, reward
+    test_condition: Tuple[float, float] = (0.2, 0.7) # cost, reward
     
     condition_guidance_w: float = 2. # TODO weight
     saving_interval = 10000
@@ -146,6 +146,9 @@ class DDDroneRunConfig(OASISTrainConfig):
     # model params
     seq_len: int = 32
     episode_len: int = 200
+    embedding_dim: int = 128 # 128
+    update_steps: int = 600_000
+    
     # training params
     task: str = "OfflineDroneRun-v0"
     target_returns: Tuple[Tuple[float, ...],
@@ -161,9 +164,10 @@ class DDDroneRunConfig(OASISTrainConfig):
 @dataclass
 class DDDroneCircleConfig(OASISTrainConfig):
     # model params
-    seq_len: int = 64
+    seq_len: int = 32
+    embedding_dim: int = 128 # 128
     episode_len: int = 300
-    update_steps: int = 250_000
+    update_steps: int = 600_000
     # training params
     task: str = "OfflineDroneCircle-v0"
     target_returns: Tuple[Tuple[float, ...],
@@ -180,6 +184,7 @@ class DDDroneCircleConfig(OASISTrainConfig):
 class DDCarRunConfig(OASISTrainConfig):
     # model params
     seq_len: int = 32
+    embedding_dim: int = 64
     episode_len: int = 200
     # training params
     task: str = "OfflineCarRun-v0"
@@ -215,6 +220,7 @@ class DDBallRunConfig(OASISTrainConfig):
     # model params
     # seq_len: int = 32
     episode_len: int = 100
+    embedding_dim: int = 64
     # training params
     task: str = "OfflineBallRun-v0"
     target_returns: Tuple[Tuple[float, ...],

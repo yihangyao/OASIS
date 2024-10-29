@@ -1,11 +1,30 @@
-# <img src="figure/oasis.png" width="40"> OASIS: Conditional Distribution Shaping for Offline Safe Reinforcement Learning 
-Conference on Neural Information Processing Systems (NeurIPS), 2024
+<h1 align="center">
+<img src="figure/oasis.png" width="100" alt="ToRA" />
+<br>
+OASIS: Conditional Distribution Shaping for Offline Safe Reinforcement Learning
+</h1>
 
-[**[Project Page]**](https://zhengyinan-air.github.io/FISOR/) [**[Arxiv]**](https://arxiv.org/pdf/2401.10700.pdf) [**[Openreview]**](https://openreview.net/forum?id=j5JvZCaDM0)
+
+<p align="center">
+  <a href="https://sites.google.com/view/saferl-oasis/home"><b>[🌐 Website]</b></a> •
+  <a href="https://arxiv.org/abs/2407.14653"><b>[📜 Arxiv]</b></a> •
+  <a href=" "><b>[🤗 HF Models]</b></a> 
+  <br>
+</p>
+
+<p align="center">
+Repo for "<a href="https://arxiv.org/abs/2407.14653" target="_blank">OASIS: Conditional Distribution Shaping for Offline Safe Reinforcement Learning</a>" [NeurIPS'2024]
+</p>
+
+
+<div align="center">
 
 [Yihang Yao*](https://yihangyao.github.io/), [Zhepeng Cen*](https://czp16.github.io/), [Wenhao Ding](https://wenhao.pub/), [Haohong Lin](https://hhlin.info/), [Shiqi Liu](https://shiqiliu-67.github.io/), [Tingnan Zhang](https://scholar.google.com/citations?user=RM2vMNcAAAAJ&hl=en), [Wenhao Yu](https://wenhaoyu.weebly.com/), [Ding Zhao](https://safeai-lab.github.io/#slide1)
+</div>
 
-The official implementation of OASIS, a **Data-centric** approach for offline safe RL.
+
+
+<!-- The official implementation of OASIS, a **Data-centric** approach for offline safe RL. -->
 
 # Methods
 
@@ -44,18 +63,22 @@ The proposed method contains 3 steps:
 
 (3) Training an offline safe RL agent on this generated dataset.
 
+This repo provides the training configs for tasks containing: 
+
 ## (Step 1) OASIS Training
 To train an OASIS data generator, run:
 ```
 cd OSRL/examples/train
 python train_oasis.py
 ```
-It will train an OASIS model for the Ball-Circle task using tempting dataset. The learned models contain a data (state-sequence) generator and an inverse dynamics model. The reward and cost models can be trained by running the following commands:
+It will train an OASIS model for the Ball-Circle task using tempting dataset. The learned models contain a data (state-sequence) generator and an inverse dynamics model. The reward model for OfflineDroneRun-v0 can be trained by running the following commands:
 
 ```
-cd OSRL/examples/label_models
-sh train_models.sh
+cd OSRL/examples/train
+python train_label.py --task OfflineDroneRun-v0 --learning_mode reward
 ```
+
+You can change the task to be [`OfflineBallCircle-v0`, `OfflineCarCircle-v0`, `OfflineDroneCircle-v0`, `OfflineBallRun-v0`, `OfflineCarRun-v0`, `OfflineDroneRun-v0`]. By default, we use `OfflineBallCircle-v0`.
 
 A set of learned models's checkpoints are also provided in the folder OASIS/models.
 

@@ -7,10 +7,10 @@ import numpy as np
 
 @dataclass
 class BCQLTrainConfig:
-    project: str = "OASIS-BCQL-Camera-Ready" 
+    project: str = "OASIS-BCQL-Camera-Ready-1029" 
     group: str = None
     name: Optional[str] = None
-    prefix: Optional[str] = "OASIS-BCQL-1027-CR-[0.1, 0.7]-new_model-2"
+    prefix: Optional[str] = "OASIS-BCQL-1029-CaRe-[[0.071, 0.3], [0.107, 0.3], [0.143, 0.35]]-1"
     suffix: Optional[str] = ""
     logdir: Optional[str] = "logs"
     verbose: bool = True
@@ -21,11 +21,11 @@ class BCQLTrainConfig:
     epsilon: float = None
     density: float = 1
     # training params
-    task: str = "OfflineCarCircle-v0"
+    task: str = "OfflineDroneRun-v0"
     dataset: str = None
     seed: int = 33
     device: str = "cuda:1"
-    new_data_path: Optional[str] = "../../../dataset/OfflineCarCircle-v0-num-96000_BC_-batch_size-6000-c-10-condition-[[0.1, 0.7]]-1027-CAMERA-2.hdf5"
+    new_data_path: Optional[str] = "../../../dataset/OfflineDroneRun-v0-num-192000_BC_-batch_size-12000-c-20-condition-[[0.071, 0.3], [0.107, 0.3], [0.143, 0.35]]-1027-CAMERA-1.hdf5"
 
     update_data: bool = True
     replace: bool = True

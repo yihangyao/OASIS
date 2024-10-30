@@ -6,7 +6,7 @@ import numpy as np
 class OASISTrainConfig:
     # wandb params
     project: str = "OASIS-(Camera Ready)-1027"
-    task: str = "OfflineDroneCircle-v0" 
+    task: str = "OfflineDroneRun-v0" 
     group: str = None
     name: Optional[str] = None
     prefix: Optional[str] = "OASIS"
@@ -20,7 +20,7 @@ class OASISTrainConfig:
     epsilon: float = None
     density: float = 1
     # model params
-    embedding_dim: int = 32 # 128
+    embedding_dim: int = 128 # 32 # 128
     num_layers: int = 3
     num_heads: int = 8
     action_head_layers: int = 1

@@ -100,7 +100,7 @@ generated dataset, run:
 cd OSRL/examples/train
 python train_bcql.py
 ```
-It will use the dataset saved in the "dataset" folder to train an BCQ-Lag agent. The cost limit is 20. If you want to use your own dataset for training, please change the data path new_data_path at osrl/configs/bcql_configs.py
+It will use the dataset saved in the "dataset" folder to train an BCQ-Lag agent. The cost limit is 20. If you want to use your own dataset for training, you may change the data path by `python train_bcql.py --new_data_path [your_path]` in the code above.
 
 ### Github Reference
 - Decision Diffuser: https://github.com/anuragajay/decision-diffuser

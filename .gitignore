@@ -21,7 +21,9 @@ envs/safety-gym/mujoco200_linux
 **/misc/**
 
 *.pth
-# *.png
+*.png
+*.txt
+*.yaml
 
 **/**.pt
 # C extensions

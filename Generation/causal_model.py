@@ -4,6 +4,10 @@ from torch.nn import functional as F
 import numpy as np
 from torch.utils.data import IterableDataset
 
+# This script is built based on the reference: 
+# Seeing is not Believing: Robust Reinforcement Learning against Spurious Correlation
+# https://arxiv.org/abs/2307.07907
+
 def CUDA(var, device = 'cuda:2'):
     device = torch.device(device if torch.cuda.is_available() else 'cpu')
     var = var.to(device)

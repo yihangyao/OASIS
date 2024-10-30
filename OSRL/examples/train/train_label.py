@@ -40,15 +40,15 @@ def load_data(filename):
 @dataclass
 class TrainCfg:
     # general task params
-    task: str = "OfflineDroneCircle-v0"
-    device: str = "cuda:3"
+    task: str = "OfflineDroneRun-v0"
+    device: str = "cuda:0"
     epoch: int = 301
     step_per_epoch: int = 500
     batch_size: int = 32
     num_workers: int = 1
     lr: float = 1e-4
 
-    learning_mode = "reward"
+    learning_mode = "cost"
     
     # task:
     velocity_constraint: float = 1.5
@@ -69,12 +69,12 @@ class TrainCfg:
 
     # logger 
     verbose: bool = True
-    project: str = task
+    project: str = "OASIS-" + task + "-" + learning_mode + "-camera-ready"
     suffix: str = ""
     prefix: str = ""
     name = None
     group = None
-    logdir = "causal_log"
+    logdir = "label_log"
     
 
 @pyrallis.wrap()
@@ -180,7 +180,7 @@ def train(args: TrainCfg):
             name = "epoch_"+str(step) + "_prob"
             plt.title(name)
 
-            mask_logdir = "mask_fig/"+args.task+"/log"+ args.learning_mode + args.log_suffix 
+            mask_logdir = "label_results/"+args.task+"/log"+ args.learning_mode + args.log_suffix 
             if not os.path.exists(mask_logdir):
                 os.makedirs(mask_logdir)
 
@@ -207,7 +207,7 @@ def train(args: TrainCfg):
     print("mse evaluation:", mse_total)
     
     # save model
-    path = "mask_fig/"+args.task+"/log"+ args.learning_mode + args.log_suffix+"/"+args.learning_mode + "-epoch_"+str(args.epoch)+".pt"
+    path = "label_results/"+args.task+"/log"+ args.learning_mode + args.log_suffix+"/"+args.learning_mode + "-epoch_"+str(args.epoch)+".pt"
     decomposition.save_model(path=path)
 
     return

@@ -77,6 +77,7 @@ def main(args: OASISTrainConfig):
                                 removed_c_max=args.removed_c_max,
                                 removed_ratio=args.removed_ratio
                                 )
+    
     print("removed ratio:", args.removed_ratio)
     # wrapper
     env = wrap_env(
@@ -112,14 +113,18 @@ def main(args: OASISTrainConfig):
         condition_guidance_w = args.condition_guidance_w
     )
     
-    path = "../models/CC/CC_160000.pt"
+    path = "../models/DR/DR_600000.pt"
 
     model_state = torch.load(path) #  model.load_state_dict
     model.load_state_dict(model_state['model_state'])
     model.to(args.device)
+    if "Run" in args.task:
+        dim_times = 2
+    else:
+        dim_times = 1
     
     reward_model = CausalDecomposition(
-        input_dim=env.observation_space.shape[0], 
+        input_dim=env.observation_space.shape[0] * dim_times, 
         output_dim=2,
         hidden_dim=128,
         causal_dim=10,
@@ -134,7 +139,7 @@ def main(args: OASISTrainConfig):
     )
 
     cost_model = CausalDecomposition(
-        input_dim=env.observation_space.shape[0], 
+        input_dim=env.observation_space.shape[0] * dim_times, 
         output_dim=2,
         hidden_dim=128,
         causal_dim=10,
@@ -148,8 +153,8 @@ def main(args: OASISTrainConfig):
         learning_mode="cost"
     )
 
-    reward_model.load_model(path="../models/CC/CC_reward.pt")
-    cost_model.load_model(path="../models/CC/CC_cost.pt")
+    reward_model.load_model(path="../models/DR/DR_reward.pt")
+    cost_model.load_model(path="../models/DR/DR_cost.pt")
 
     reward_model.eval()
     cost_model.eval()
@@ -184,7 +189,7 @@ def eval_generation_traj(dataset,
     # observations, next_observations, actions, rewards, costs, done
     # seq_len += 1
     model.eval()
-    batch_size = 6000  # dataset.dataset_size // seq_len
+    batch_size = 4000  # dataset.dataset_size // seq_len
     s, next_observations, actions, rewards, costs, done = dataset.random_sample(batch_size)
 
     # s: [Batch_size, s_dim]
@@ -198,12 +203,12 @@ def eval_generation_traj(dataset,
 
     clip_len = min(clip_len+1, seq_len)
     
-    safety_threshold = 10
+    safety_threshold = 20
     cost_scale = cost_scale_max
     print("cost scale:", cost_scale)
     cost_condition = safety_threshold / cost_scale # 20 means the cost safety threshold
     
-    test_condition_list = [[cost_condition, 0.7]]
+    test_condition_list = [[0.071, 0.3], [0.107, 0.3], [0.143, 0.35]]
     
     with torch.no_grad():
         s_list = None
@@ -227,7 +232,8 @@ def eval_generation_traj(dataset,
                 s=s_ori,
                 reward_model=reward_model,
                 cost_model=cost_model,
-                clip_len=clip_len
+                clip_len=clip_len,
+                name = name
             )
 
             r_pred = r_pred.reshape(-1, clip_len-1) * 10
@@ -276,7 +282,7 @@ def eval_generation_traj(dataset,
 
         num = s_list.shape[0] * s_list.shape[1] 
 
-    suffix = "_BC_" + "-batch_size-" + str(batch_size) + "-c-" + str(safety_threshold) + '-condition-' + str(test_condition_list) + '-1027-CAMERA-2'
+    suffix = "_BC_" + "-batch_size-" + str(batch_size) + "-c-" + str(safety_threshold) + '-condition-' + str(test_condition_list) + '-1027-CAMERA-1'
     if zero_rc:
         suffix += "-zero_rc"
 
@@ -297,7 +303,9 @@ def conditional_generation(device,
                            s,
                            reward_model = None,
                            cost_model = None, 
-                           clip_len = 8):
+                           clip_len = 8,
+                           name = ""
+                           ):
     obs = s
     conditions = {0: to_torch(obs, device=device)}
     samples, diffusion = model.conditional_sample(conditions,
@@ -324,10 +332,18 @@ def conditional_generation(device,
     s = dataset.denormalize_obs(s)
     s_next = dataset.denormalize_obs(s_next)
     a = dataset.denormalize_action(a)
+    
+    s_cuda = torch.tensor(s, device=device)
+    s_next_cuda = torch.tensor(s_next, device=device)
+    a_cuda = torch.tensor(a, device=device)
 
     if reward_model is not None and cost_model is not None:
-        r_pred = reward_model(torch.tensor(s_next, device=device))
-        c_pred = cost_model(torch.tensor(s_next, device=device))
+        if "Run" in name:
+            input_val = torch.cat((s_cuda, s_next_cuda), axis=-1)
+        else:
+            input_val = s_next_cuda
+        r_pred = reward_model(input_val)
+        c_pred = cost_model(input_val)
         r_pred = r_pred.detach().cpu().numpy() * 0.1
         c_pred = c_pred.detach().cpu().numpy()
     

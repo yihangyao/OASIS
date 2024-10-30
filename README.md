@@ -8,7 +8,7 @@ OASIS: Conditional Distribution Shaping for Offline Safe Reinforcement Learning
 <p align="center">
   <a href="https://sites.google.com/view/saferl-oasis/home"><b>[🌐 Website]</b></a> •
   <a href="https://arxiv.org/abs/2407.14653"><b>[📜 Arxiv]</b></a> •
-  <a href=" "><b>[🤗 HF Models]</b></a> 
+  <a href="https://huggingface.co/YYY-45/OASIS/tree/main"><b>[🤗 HF Models]</b></a> 
   <br>
 </p>
 
@@ -37,7 +37,7 @@ Repo for "<a href="https://arxiv.org/abs/2407.14653" target="_blank">OASIS: Cond
 
 
 ![Figure](figure/oasis-overview.png)
-**OASIS:** a _Data-centric_ approach for offline safe RL. Conditioned on the human preference, OASIS first curates an offline dataset with a conditioned diffusion data generator and learned labeling models, then trains safe RL agents with this generated dataset.
+**OASIS:** a _Data-centric_ approach for offline safe RL. Conditioned on the human preference, OASIS first curates an offline dataset with a conditioned diffusion data generator and learned labeling models, then trains safe RL agents with this generated dataset. We provide example checkpoints for models and curated datasets at our 🤗 huggingface [repo](https://huggingface.co/YYY-45/OASIS/tree/main).
 
 <!-- \end{center} -->
 

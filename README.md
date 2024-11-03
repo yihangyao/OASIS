@@ -72,7 +72,7 @@ To train an OASIS data generator, run:
 cd OSRL/examples/train
 python train_oasis.py
 ```
-It will train an OASIS model for the `Ball-Circle` task using the tempting dataset. The learned models contain a data (state-sequence) generator and an inverse dynamics model. The reward model for OfflineDroneRun-v0 can be trained by running the following commands:
+It will train an OASIS model for the `OfflineBallCircle-v0` task using the tempting dataset. The learned models contain a data (state-sequence) generator and an inverse dynamics model. The reward model for `OfflineBallCircle-v0` can be trained by running the following commands:
 
 ``` bash
 cd OSRL/examples/train

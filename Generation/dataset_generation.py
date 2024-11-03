@@ -306,14 +306,14 @@ def curate_dataset(
 
         num = s_list.shape[0] * s_list.shape[1] 
 
-    suffix = "-" + str(test_condition_list)
+    suffix = "-from_tempting" 
     
     if zero_rc:
         suffix += "-zero_rc"
 
     save(
         log_dir=data_saving_path,
-        dataset_name= name +  "-num-" + str(num) + suffix + \
+        dataset_name= name + suffix + \
                   ".hdf5",
         data=traj_data
     )

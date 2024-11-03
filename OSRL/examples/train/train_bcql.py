@@ -16,7 +16,7 @@ from fsrl.utils import WandbLogger
 from torch.utils.data import DataLoader
 from tqdm.auto import trange  # noqa
 
-from osrl.configs.bcql_configs import BCQLTrainConfig
+from osrl.configs.bcql_configs import BCQL_DEFAULT_CONFIG, BCQLTrainConfig
 from osrl.algorithms import BCQL, BCQLTrainer
 from osrl.common import TransitionDataset
 from osrl.common.exp_util import auto_name, seed_all
@@ -27,12 +27,12 @@ def train(args: BCQLTrainConfig):
     # update config
     cfg, old_cfg = asdict(args), asdict(BCQLTrainConfig())
     differing_values = {key: cfg[key] for key in cfg.keys() if cfg[key] != old_cfg[key]}
-    cfg = asdict(BCQLTrainConfig())
+    cfg = asdict(BCQL_DEFAULT_CONFIG[args.task]())
     cfg.update(differing_values)
     args = types.SimpleNamespace(**cfg)
 
     # setup logger
-    default_cfg = asdict(BCQLTrainConfig())
+    default_cfg = asdict(BCQL_DEFAULT_CONFIG[args.task]())
     if args.name is None:
         args.name = auto_name(default_cfg, cfg, args.prefix, args.suffix)
     if args.group is None:

@@ -7,10 +7,10 @@ import numpy as np
 
 @dataclass
 class BCQLTrainConfig:
-    project: str = "OASIS-BCQL-Camera-Ready-1103-4" 
+    project: str = "OASIS-RL_agent" 
     group: str = None
     name: Optional[str] = None
-    prefix: Optional[str] = "OASIS-BCQL-1103-check-[[0.07, 0.37], [0.11, 0.37], [0.14, 0.37]]"
+    prefix: Optional[str] = "OASIS-BCQL"
     suffix: Optional[str] = ""
     logdir: Optional[str] = "logs"
     verbose: bool = True
@@ -21,12 +21,13 @@ class BCQLTrainConfig:
     epsilon: float = None
     density: float = 1
     # training params
-    task: str = "OfflineDroneRun-v0"
+    task: str = "OfflineBallCircle-v0"
     dataset: str = None
     seed: int = 33
     device: str = "cuda:0"
-    new_data_path: Optional[str] = "../../../dataset/from_tempting/OfflineDroneRun-v0-num-192000-[[0.07, 0.37], [0.11, 0.37], [0.14, 0.37]].hdf5"
+    new_data_path: Optional[str] = "../../../dataset/from_tempting/OfflineBallCircle-v0-from_tempting.hdf5"
 
+    # True means to use curated dataset
     update_data: bool = True
     replace: bool = True
 
@@ -49,7 +50,7 @@ class BCQLTrainConfig:
     cost_limit: int = 20
     episode_len: int = 300
     batch_size: int = 512
-    update_steps: int = 50_000
+    update_steps: int = 25_000
     num_workers: int = 8
     # model params
     a_hidden_sizes: List[float] = field(default=[256, 256], is_mutable=True)
@@ -65,4 +66,52 @@ class BCQLTrainConfig:
     eval_episodes: int = 10
     eval_every: int = 2500
 
+@dataclass
+class BCQLBallCircleConfig(BCQLTrainConfig):
+    # training params
+    episode_len: int = 200
+    new_data_path: Optional[str] = "../../../dataset/from_tempting/OfflineBallCircle-v0-from_tempting.hdf5"
 
+
+@dataclass
+class BCQLBallRunConfig(BCQLTrainConfig):
+    # dataset info
+    episode_len: int = 100
+    new_data_path: Optional[str] = "../../../dataset/from_tempting/OfflineBallRun-v0-from_tempting.hdf5"
+
+
+@dataclass
+class BCQLCarCircleConfig(BCQLTrainConfig):
+    # dataset info
+    new_data_path: Optional[str] = "../../../dataset/from_tempting/OfflineCarCircle-v0-from_tempting.hdf5"
+    
+@dataclass
+class BCQLCarRunConfig(BCQLTrainConfig):
+    # dataset info
+    episode_len: int = 200
+    new_data_path: Optional[str] = "../../../dataset/from_tempting/OfflineCarRun-v0-from_tempting.hdf5"
+
+@dataclass
+class BCQLDroneRunConfig(BCQLTrainConfig):
+    # dataset info
+    episode_len: int = 200    
+    new_data_path: Optional[str] = "../../../dataset/from_tempting/OfflineDroneRun-v0-from_tempting.hdf5"
+    update_steps: int = 50_000
+
+@dataclass
+class BCQLDroneCircleConfig(BCQLTrainConfig):
+    # dataset info
+    episode_len: int = 300
+    new_data_path: Optional[str] = "../../../dataset/from_tempting/OfflineDroneCircle-v0-from_tempting.hdf5"
+    update_steps: int = 50_000
+
+
+BCQL_DEFAULT_CONFIG = {
+    # bullet_safety_gym
+    "OfflineCarCircle-v0": BCQLCarCircleConfig,
+    "OfflineDroneRun-v0": BCQLDroneRunConfig,
+    "OfflineDroneCircle-v0": BCQLDroneCircleConfig,
+    "OfflineCarRun-v0": BCQLCarRunConfig,
+    "OfflineBallCircle-v0": BCQLBallCircleConfig,
+    "OfflineBallRun-v0": BCQLBallRunConfig,
+}

@@ -11,19 +11,19 @@ import numpy as np
 import pyrallis
 import torch
 from dsrl.infos import DENSITY_CFG
-from dsrl.offline_env import OfflineEnvWrapper, wrap_env, NormalizationEnvWrapper  # noqa
+from dsrl.offline_env import wrap_env # noqa
 from fsrl.utils import WandbLogger
 from torch.utils.data import DataLoader
 from tqdm.auto import trange  # noqa
 
-from osrl.configs.oasis_configs import OASISTrainConfig
+from osrl.configs.oasis_configs import OASISTrainConfig, DD_DEFAULT_CONFIG
 from osrl.common import TransitionDataset
 from osrl.common.exp_util import auto_name, seed_all
 
-from osrl.common.net import cosine_beta_schedule, extract, apply_conditioning, Losses, TemporalUnet, to_torch
+from osrl.common.net import  to_torch
 from osrl.algorithms import OASIS
 import matplotlib.pyplot as plt
-from osrl.common import SequenceDataset
+# from osrl.common import SequenceDataset
 # import seaborn as sns
 
 from osrl.common.plot import *
@@ -37,11 +37,26 @@ from tianshou.data import Batch
 from osrl.common.function import save
 
 from causal_model import CausalDecomposition
-import torch.nn as nn
+
+Short_name_map = {
+    # bullet_safety_gym
+    "OfflineBallRun-v0": "BR",
+    "OfflineBallCircle-v0": "BC",
+    "OfflineCarRun-v0": "CR",
+    "OfflineCarCircle-v0": "CC",
+    "OfflineDroneRun-v0": "DR",
+    "OfflineDroneCircle-v0": "DC",
+}
 
 @pyrallis.wrap()
 def main(args: OASISTrainConfig):
+    # cfg, old_cfg = asdict(args), asdict(OASISTrainConfig())
+    
     cfg, old_cfg = asdict(args), asdict(OASISTrainConfig())
+    differing_values = {key: cfg[key] for key in cfg.keys() if cfg[key] != old_cfg[key]}
+    cfg = asdict(DD_DEFAULT_CONFIG[args.task]())
+    cfg.update(differing_values)
+    args = types.SimpleNamespace(**cfg)
 
     if "Metadrive" in args.task:
         import gym
@@ -113,11 +128,13 @@ def main(args: OASISTrainConfig):
         condition_guidance_w = args.condition_guidance_w
     )
     
-    path = "../models/CC/CC_camera_ready.pt"
+    short_name = Short_name_map[args.task]
+    path = args.generator_loading_path + "{}_diffusion.pt".format(short_name)
 
     model_state = torch.load(path) #  model.load_state_dict
     model.load_state_dict(model_state['model_state'])
     model.to(args.device)
+    
     if "Run" in args.task:
         dim_times = 2
     else:
@@ -152,14 +169,23 @@ def main(args: OASISTrainConfig):
         device=args.device,
         learning_mode="cost"
     )
+    
+    reward_model_path = args.labeling_model_path + "{}_reward.pt".format(short_name)
+    cost_model_path = args.labeling_model_path + "{}_cost.pt".format(short_name)
 
-    reward_model.load_model(path="../models/CC/CC_reward.pt")
-    cost_model.load_model(path="../models/CC/CC_cost.pt")
+    reward_model.load_model(path=reward_model_path)
+    cost_model.load_model(path=cost_model_path)
 
     reward_model.eval()
     cost_model.eval()
-
-    eval_generation_traj(
+    
+    cost_scale = env.cost_scale_max
+    reward_scale = env.reward_scale_max
+    # exit()
+    
+    condition = [[round(cost / cost_scale, 2), round(reward / reward_scale, 2)] for (reward, cost) in args.generation_conditions]
+    
+    curate_dataset(
         dataset=dataset,
         model = model,
         seq_len=args.seq_len,
@@ -168,21 +194,24 @@ def main(args: OASISTrainConfig):
         reward_model=reward_model,
         cost_model=cost_model,
         clip_len=16,
-        cost_scale_max = env.cost_scale_max
+        data_saving_path=args.data_saving_path,
+        generation_condition=condition
     )
 
 
-def eval_generation_traj(dataset, 
-                        model=None, 
-                        seq_len = None,
-                        device = "cuda:3",
-                        name = "",
-                        zero_rc = False,
-                        reward_model = None,
-                        cost_model = None,
-                        clip_len = 16,
-                        cost_scale_max = 100
-                        ):
+def curate_dataset(
+        dataset, 
+        model=None, 
+        seq_len = None,
+        device = "cuda:3",
+        name = "",
+        zero_rc = False,
+        reward_model = None,
+        cost_model = None,
+        clip_len = 16,
+        data_saving_path = "",
+        generation_condition = None
+    ):
     """
         model is a diffusion model
     """
@@ -190,7 +219,7 @@ def eval_generation_traj(dataset,
     # seq_len += 1
     model.eval()
     batch_size = 4000  # dataset.dataset_size // seq_len
-    s, next_observations, actions, rewards, costs, done = dataset.random_sample(batch_size)
+    s, _, _, _, _, _ = dataset.random_sample(batch_size)
 
     # s: [Batch_size, s_dim]
 
@@ -203,12 +232,7 @@ def eval_generation_traj(dataset,
 
     clip_len = min(clip_len+1, seq_len)
     
-    safety_threshold = 20
-    cost_scale = cost_scale_max
-    print("cost scale:", cost_scale)
-    cost_condition = safety_threshold / cost_scale # 20 means the cost safety threshold
-    
-    test_condition_list = [[0.1, 0.6], [0.15, 0.6], [0.2, 0.6]]
+    test_condition_list = generation_condition
     
     with torch.no_grad():
         s_list = None
@@ -282,12 +306,13 @@ def eval_generation_traj(dataset,
 
         num = s_list.shape[0] * s_list.shape[1] 
 
-    suffix = "_BC_" + "-batch_size-" + str(batch_size) + "-c-" + str(safety_threshold) + '-condition-' + str(test_condition_list) + '-1102-CAMERA-1'
+    suffix = "-" + str(test_condition_list)
+    
     if zero_rc:
         suffix += "-zero_rc"
 
     save(
-        log_dir="../dataset/",
+        log_dir=data_saving_path,
         dataset_name= name +  "-num-" + str(num) + suffix + \
                   ".hdf5",
         data=traj_data
@@ -321,9 +346,6 @@ def conditional_generation(device,
     x_comb_t = torch.cat([s, s_next], dim=-1)
     x_comb_t = x_comb_t.reshape(-1, 2 * s_next.shape[-1])
     a = model.inv_model(x_comb_t)
-
-    
-
 
     s = s.detach().cpu().numpy()
     s_next = s_next.detach().cpu().numpy()

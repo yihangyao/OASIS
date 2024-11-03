@@ -7,10 +7,10 @@ import numpy as np
 
 @dataclass
 class BCQLTrainConfig:
-    project: str = "OASIS-BCQL-Camera-Ready-1102" 
+    project: str = "OASIS-BCQL-Camera-Ready-1103-4" 
     group: str = None
     name: Optional[str] = None
-    prefix: Optional[str] = "OASIS-BCQL-1102-CaRe-[[0.1, 0.6], [0.15, 0.6], [0.2, 0.6]]-1"
+    prefix: Optional[str] = "OASIS-BCQL-1103-check-[[0.07, 0.37], [0.11, 0.37], [0.14, 0.37]]"
     suffix: Optional[str] = ""
     logdir: Optional[str] = "logs"
     verbose: bool = True
@@ -21,11 +21,11 @@ class BCQLTrainConfig:
     epsilon: float = None
     density: float = 1
     # training params
-    task: str = "OfflineCarCircle-v0"
+    task: str = "OfflineDroneRun-v0"
     dataset: str = None
     seed: int = 33
-    device: str = "cuda:3"
-    new_data_path: Optional[str] = "../../../dataset/OfflineCarCircle-v0-num-192000_BC_-batch_size-12000-c-20-condition-[[0.1, 0.6], [0.15, 0.6], [0.2, 0.6]]-1102-CAMERA-1.hdf5"
+    device: str = "cuda:0"
+    new_data_path: Optional[str] = "../../../dataset/from_tempting/OfflineDroneRun-v0-num-192000-[[0.07, 0.37], [0.11, 0.37], [0.14, 0.37]].hdf5"
 
     update_data: bool = True
     replace: bool = True
@@ -49,7 +49,7 @@ class BCQLTrainConfig:
     cost_limit: int = 20
     episode_len: int = 300
     batch_size: int = 512
-    update_steps: int = 100_000
+    update_steps: int = 50_000
     num_workers: int = 8
     # model params
     a_hidden_sizes: List[float] = field(default=[256, 256], is_mutable=True)

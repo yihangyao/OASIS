@@ -382,6 +382,11 @@ class OfflineEnv(gym.Env):
         cost_returns = np.array(cost_returns)
         reward_returns = np.array(reward_returns)
         self.cost_scale_max = cost_returns.max()
+        self.reward_scale_max = reward_returns.max()
+        
+        print("original dataset cost_scale:", self.cost_scale_max)
+        print("original dataset reward_scale:", self.reward_scale_max)
+        
 
         self.reward_returns = reward_returns / reward_returns.max()
         self.cost_returns = cost_returns / cost_returns.max()

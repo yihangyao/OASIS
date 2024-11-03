@@ -46,7 +46,7 @@ Repo for "<a href="https://arxiv.org/abs/2407.14653" target="_blank">OASIS: Cond
 This code is tested on an Ubuntu 18.04 system.
 To install the packages, please first create a python environment with python==3.8, then run:
 
-```
+``` bash
 cd OSRL
 pip install -e .
 cd ../DSRL
@@ -64,45 +64,56 @@ The proposed method contains 3 steps:
 
 (3) Training an offline safe RL agent on this generated dataset.
 
-This repo provides the training configs for tasks containing: 
+> If you want to skip the generator and labeling models training, you may go to step 3 directly and download the pre-trained models and generated dataset instead.
 
 ## (Step 1) OASIS Training
 To train an OASIS data generator, run:
-```
+``` bash
 cd OSRL/examples/train
 python train_oasis.py
 ```
-It will train an OASIS model for the Ball-Circle task using tempting dataset. The learned models contain a data (state-sequence) generator and an inverse dynamics model. The reward model for OfflineDroneRun-v0 can be trained by running the following commands:
+It will train an OASIS model for the `Ball-Circle` task using the tempting dataset. The learned models contain a data (state-sequence) generator and an inverse dynamics model. The reward model for OfflineDroneRun-v0 can be trained by running the following commands:
 
-```
+``` bash
 cd OSRL/examples/train
-python train_label.py --task OfflineDroneRun-v0 --learning_mode reward
+python train_label.py --task OfflineBallCircle-v0 --learning_mode reward
 ```
 
 You can change the task to be [`OfflineBallCircle-v0`, `OfflineCarCircle-v0`, `OfflineDroneCircle-v0`, `OfflineBallRun-v0`, `OfflineCarRun-v0`, `OfflineDroneRun-v0`]. By default, we use `OfflineBallCircle-v0`.
 
-A set of learned models's checkpoints are also provided in the folder OASIS/models.
+A set of learned models's checkpoints as well as generated datasets are available online. Download them by running:
+
+``` bash
+cd OASIS
+git clone https://huggingface.co/YYY-45/OASIS
+```
 
 ## (Step 2) Dataset Generation
 To generate a dataset using OASIS, run:
-```
+``` bash
 cd Generation
 python dataset_generation.py
 ```
 It will use the pre-trained OASIS model "BallCircle.pt" in the "OASIS/models" folder, and use pre-trained cost/reward models "BC_cost.pt" and "BC_reward.pt" to label the dataset. The generated dataset is saved to the "dataset" folder. The target cost limit is 20. To change the models to use, please specify the model path by: . Please make sure that the model configs are aligned.
 
+<!-- ## Download pre-trained checkpoints
+The generated dataset can also be downloaded by running:
+``` bash
+cd OASIS
+git clone https://huggingface.co/YYY-45/OASIS
+``` -->
  
 ## (Step 3) RL agent Training
 Our method is compitable with general offline safe RL algorithms. In this paper, we train a BCQ-Lag agent on the generated dataset. To Train a BCQ-Lag agent:
 
 generated dataset, run:
-```
+``` bash
 cd OSRL/examples/train
 python train_bcql.py
 ```
 It will use the dataset saved in the "dataset" folder to train an BCQ-Lag agent. The cost limit is 20. If you want to use your own dataset for training, you may change the data path by `python train_bcql.py --new_data_path [your_path]` in the code above.
 
-### Github Reference
+## Github Reference
 - Decision Diffuser: https://github.com/anuragajay/decision-diffuser
 - AdaptDiffuser: https://github.com/Liang-ZX/AdaptDiffuser
 - OSRL: https://github.com/liuzuxin/osrl

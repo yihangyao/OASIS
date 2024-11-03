@@ -113,7 +113,7 @@ def main(args: OASISTrainConfig):
         condition_guidance_w = args.condition_guidance_w
     )
     
-    path = "../models/DR/DR_600000.pt"
+    path = "../models/CC/CC_camera_ready.pt"
 
     model_state = torch.load(path) #  model.load_state_dict
     model.load_state_dict(model_state['model_state'])
@@ -153,8 +153,8 @@ def main(args: OASISTrainConfig):
         learning_mode="cost"
     )
 
-    reward_model.load_model(path="../models/DR/DR_reward.pt")
-    cost_model.load_model(path="../models/DR/DR_cost.pt")
+    reward_model.load_model(path="../models/CC/CC_reward.pt")
+    cost_model.load_model(path="../models/CC/CC_cost.pt")
 
     reward_model.eval()
     cost_model.eval()
@@ -208,7 +208,7 @@ def eval_generation_traj(dataset,
     print("cost scale:", cost_scale)
     cost_condition = safety_threshold / cost_scale # 20 means the cost safety threshold
     
-    test_condition_list = [[0.071, 0.3], [0.107, 0.3], [0.143, 0.35]]
+    test_condition_list = [[0.1, 0.6], [0.15, 0.6], [0.2, 0.6]]
     
     with torch.no_grad():
         s_list = None
@@ -282,7 +282,7 @@ def eval_generation_traj(dataset,
 
         num = s_list.shape[0] * s_list.shape[1] 
 
-    suffix = "_BC_" + "-batch_size-" + str(batch_size) + "-c-" + str(safety_threshold) + '-condition-' + str(test_condition_list) + '-1027-CAMERA-1'
+    suffix = "_BC_" + "-batch_size-" + str(batch_size) + "-c-" + str(safety_threshold) + '-condition-' + str(test_condition_list) + '-1102-CAMERA-1'
     if zero_rc:
         suffix += "-zero_rc"
 

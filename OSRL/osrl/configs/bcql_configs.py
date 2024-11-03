@@ -7,10 +7,10 @@ import numpy as np
 
 @dataclass
 class BCQLTrainConfig:
-    project: str = "OASIS-BCQL-Camera-Ready-1029" 
+    project: str = "OASIS-BCQL-Camera-Ready-1102" 
     group: str = None
     name: Optional[str] = None
-    prefix: Optional[str] = "OASIS-BCQL-1029-CaRe-[[0.071, 0.3], [0.107, 0.3], [0.143, 0.35]]-1"
+    prefix: Optional[str] = "OASIS-BCQL-1102-CaRe-[[0.1, 0.6], [0.15, 0.6], [0.2, 0.6]]-1"
     suffix: Optional[str] = ""
     logdir: Optional[str] = "logs"
     verbose: bool = True
@@ -21,11 +21,11 @@ class BCQLTrainConfig:
     epsilon: float = None
     density: float = 1
     # training params
-    task: str = "OfflineDroneRun-v0"
+    task: str = "OfflineCarCircle-v0"
     dataset: str = None
     seed: int = 33
-    device: str = "cuda:1"
-    new_data_path: Optional[str] = "../../../dataset/OfflineDroneRun-v0-num-192000_BC_-batch_size-12000-c-20-condition-[[0.071, 0.3], [0.107, 0.3], [0.143, 0.35]]-1027-CAMERA-1.hdf5"
+    device: str = "cuda:3"
+    new_data_path: Optional[str] = "../../../dataset/OfflineCarCircle-v0-num-192000_BC_-batch_size-12000-c-20-condition-[[0.1, 0.6], [0.15, 0.6], [0.2, 0.6]]-1102-CAMERA-1.hdf5"
 
     update_data: bool = True
     replace: bool = True
@@ -35,7 +35,7 @@ class BCQLTrainConfig:
     removed_c_min: float = 0.
     removed_c_max: float = 30.
     removed_ratio: float = 0.9
-    removed_all_ratio: float = 0.2
+    removed_all_ratio: float = 0.9
 
     threads: int = 4
     reward_scale: float = 0.1

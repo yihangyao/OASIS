@@ -381,9 +381,6 @@ class OfflineEnv(gym.Env):
         traj_idx = np.arange(n_trajs)
         cost_returns = np.array(cost_returns)
         reward_returns = np.array(reward_returns)
-
-        print("reward return max:", reward_returns.max())
-        print("cost return max:", cost_returns.max())
         self.cost_scale_max = cost_returns.max()
 
         self.reward_returns = reward_returns / reward_returns.max()

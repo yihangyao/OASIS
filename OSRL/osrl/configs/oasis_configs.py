@@ -6,7 +6,7 @@ import numpy as np
 class OASISTrainConfig:
     # wandb params
     project: str = "OASIS-(Camera Ready)-1027"
-    task: str = "OfflineDroneRun-v0" 
+    task: str = "OfflineCarCircle-v0" 
     group: str = None
     name: Optional[str] = None
     prefix: Optional[str] = "OASIS"
@@ -20,7 +20,7 @@ class OASISTrainConfig:
     epsilon: float = None
     density: float = 1
     # model params
-    embedding_dim: int = 128 # 32 # 128
+    embedding_dim: int = 32 # 32 # 128
     num_layers: int = 3
     num_heads: int = 8
     action_head_layers: int = 1
@@ -69,7 +69,7 @@ class OASISTrainConfig:
 
     # evaluation params
     target_returns: Tuple[Tuple[float, ...],
-                          ...] = ((450.0, 10), (500.0, 20), (550.0, 50))  # reward, cost
+                          ...] = ((450.0, 10))  # reward, cost
     cost_limit: int = 20
     eval_episodes: int = 5
     eval_every: int = 20000
@@ -119,6 +119,11 @@ class OASISTrainConfig:
     cgap: float = 5
     rstd: float = 1
     cstd: float = 0.2
+    
+    # Generation configs:
+    data_saving_path: str = ""
+    generator_loading_path: str = ""
+    labeling_model_path: str = ""
 
 
 @dataclass

@@ -23,7 +23,9 @@ Repo for "<a href="https://arxiv.org/abs/2407.14653" target="_blank">OASIS: Cond
 [Yihang Yao*](https://yihangyao.github.io/), [Zhepeng Cen*](https://czp16.github.io/), [Wenhao Ding](https://wenhao.pub/), [Haohong Lin](https://hhlin.info/), [Shiqi Liu](https://shiqiliu-67.github.io/), [Tingnan Zhang](https://scholar.google.com/citations?user=RM2vMNcAAAAJ&hl=en), [Wenhao Yu](https://wenhaoyu.weebly.com/), [Ding Zhao](https://safeai-lab.github.io/#slide1)
 </div>
 
-
+<div align="center">
+Email: {yihangya, zcen}[at]andrew.cmu.edu
+</div>
 
 <!-- The official implementation of OASIS, a **Data-centric** approach for offline safe RL. -->
 
@@ -105,9 +107,12 @@ Our method is compitable with general offline safe RL algorithms. In this paper,
 generated dataset, run:
 ``` bash
 cd OSRL/examples/train
-python train_bcql.py
+python train_bcql.py --task OfflineBallCircle-v0
 ```
-It will use the dataset saved in the "dataset" folder to train an BCQ-Lag agent. The cost limit is 20. If you want to use your own dataset for training, you may change the data path by `python train_bcql.py --new_data_path [your_path]` in the code above.
+
+It will use the dataset saved in the "dataset" folder to train an BCQ-Lag agent. The cost limit is 20. If you want to use your own dataset for training, you may change the data path by `python train_bcql.py --new_data_path [your_path]` in the code above. You may also use the provided dataset of other tasks by directly setting the task names in [`OfflineBallCircle-v0`, `OfflineCarCircle-v0`, `OfflineDroneCircle-v0`, `OfflineBallRun-v0`, `OfflineCarRun-v0`, `OfflineDroneRun-v0`].
+
+
 
 ## Github Reference
 - Decision Diffuser: https://github.com/anuragajay/decision-diffuser

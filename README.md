@@ -86,6 +86,8 @@ A set of learned models's checkpoints as well as generated datasets are availabl
 ``` bash
 cd OASIS
 git clone https://huggingface.co/YYY-45/OASIS
+mkdir dataset/from_tempting
+cp -r OASIS/tempting/dataset/* dataset/from_tempting
 ```
 
 ## (Step 2) Dataset Generation
@@ -96,12 +98,6 @@ python dataset_generation.py
 ```
 It will use the pre-trained OASIS model "BallCircle.pt" in the "OASIS/models" folder, and use pre-trained cost/reward models "BC_cost.pt" and "BC_reward.pt" to label the dataset. The generated dataset is saved to the "dataset" folder. The target cost limit is 20. To change the models to use, please specify the model path by: . Please make sure that the model configs are aligned.
 
-<!-- ## Download pre-trained checkpoints
-The generated dataset can also be downloaded by running:
-``` bash
-cd OASIS
-git clone https://huggingface.co/YYY-45/OASIS
-``` -->
  
 ## (Step 3) RL agent Training
 Our method is compitable with general offline safe RL algorithms. In this paper, we train a BCQ-Lag agent on the generated dataset. To Train a BCQ-Lag agent:
